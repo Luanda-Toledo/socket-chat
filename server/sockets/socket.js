@@ -27,18 +27,21 @@ io.on('connection', (client) => {
 
         //Avisamos cuando se conectan usuarios pertenecientes a una misma sala
         client.broadcast.to(data.sala).emit('listaPersona', usuarios.getPersonasPorSala(data.sala));
+        client.broadcast.to(data.sala).emit('crearMensaje', crearMensaje('Administrador', `${data.nombre} unio`));
 
         //Retornamos las personas conectadas al chat
         callback(usuarios.getPersonasPorSala(data.sala));
     });
 
     //Creamos un nuevo mensaje y luego se lo emitimos al resto de los usuarios
-    client.on('crearMensaje', (data) => {
+    client.on('crearMensaje', (data, callback) => {
 
         let persona = usuarios.getPersona(client.id);
 
         let mensaje = crearMensaje(persona.nombre, data.mensaje);
         client.broadcast.to(persona.sala).emit('crearMensaje', mensaje);
+
+        callback(mensaje);
 
     })
 
